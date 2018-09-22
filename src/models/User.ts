@@ -1,8 +1,7 @@
-import { BaseModel } from '../libs/core/BaseModel';
 import { ValidateLogin } from '../validators/LoginValidator';
 import { IsUsernameTaken } from '../validators/IsUsernameTaken';
 import { ModelInterface } from '../libs/interface/ModelInterface';
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
 import { Length, ValidationError, ValidationOptions, validate } from 'class-validator';
 
 @Entity()

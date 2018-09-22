@@ -3,7 +3,6 @@ import { User } from '../models/User';
 import Database from '../database/Database';
 import { plainToClass } from 'class-transformer';
 import { JWTService } from '../services/JWTService';
-import { ResponseCodes } from '../constants/ResponseCodes';
 
 /**
  * Returns 401 - Unauthorized

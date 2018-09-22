@@ -2,7 +2,7 @@ import 'reflect-metadata';
 import { App } from './app';
 import * as dotenv from 'dotenv';
 import Database from './database/Database';
-import { Server, createServer } from 'http';
+import { createServer } from 'http';
 dotenv.config();
 
 // Wrap Startup on EIFI
@@ -23,8 +23,8 @@ dotenv.config();
     const port = process.env.PORT;
 
     // Fire Up Server
-    server.listen(port, (err) => {
-      if (err) throw new Error(err);
+    server.listen(port, (err: Error) => {
+      if (err) throw err;
       console.log(`Running on ${port}`);
     });
   } catch(e) {

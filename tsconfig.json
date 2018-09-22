@@ -3,9 +3,12 @@
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es6",
-    "noImplicitAny": false,
     "moduleResolution": "node",
     "sourceMap": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
     "outDir": "dist",
     "baseUrl": ".",
     "paths": {

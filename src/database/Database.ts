@@ -1,5 +1,4 @@
-import moment from 'moment';
-import { createConnection, Connection, getConnection, EntityManager } from 'typeorm';
+import { createConnection, Connection, EntityManager } from 'typeorm';
 
 // Seeders
 import { UserSeed } from './seeds/UserSeed';
@@ -18,11 +17,6 @@ export class Database {
    * Entity Manager Instance
    */
   public manager: EntityManager;
-
-  /**
-   * Initialize
-   */
-  constructor() { }
 
   /**
    * Connect to MySQL
