@@ -15,7 +15,6 @@ export class UserController {
   @Post('/')
   async saveUser(@CurrentUser({ required: true }) currentUser: User, @Body() user: User): Promise<User | ValidationError[]> {
     try {
-      console.log(currentUser);
       return await this.userRepository.saveUser(user);
     } catch (error) {
       throw error;
