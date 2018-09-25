@@ -1,34 +1,15 @@
-import 'reflect-metadata';
-import { App } from './app';
 import * as dotenv from 'dotenv';
-import Database from './database/Database';
-import { createServer } from 'http';
+import { Server } from './Server';
+import { Container } from 'typedi';
+import { Database } from './database/Database';
+
 dotenv.config();
 
-// Wrap Startup on EIFI
 (async () => {
-  try {
-
-    // Connect Database
-    await Database.connect();
-
-    // Reset Database
-    await Database.reset();
-
-    // Run Seeds
-    await Database.seed();
-
-    // Build Server
-    const server = createServer(new App().app.callback());
-    const port = process.env.PORT;
-
-    // Fire Up Server
-    server.listen(port, (err: Error) => {
-      if (err) throw err;
-      console.log(`Running on ${port}`);
-    });
-  } catch(e) {
-    console.log('Start up error');
-    throw new Error(e);
-  }
+  const server = Container.get(Server).app;
+  const database = Container.get(Database);
+  await database.connect();
+  const PORT = process.env.PORT;
+  await server.listen(PORT || 3000);
+  console.log(`App running on ${PORT}`);
 })();

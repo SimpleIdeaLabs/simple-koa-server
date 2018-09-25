@@ -1,63 +1,69 @@
-import { createConnection, Connection, EntityManager } from 'typeorm';
+import 'reflect-metadata';
 
-// Seeders
-import { UserSeed } from './seeds/UserSeed';
+import * as dotenv from 'dotenv';
+import { Container } from 'typedi';
+import { User } from './models/User';
+import { Role, Roles } from './models/Role';
+import { BCryptService } from './../services/BCrypt.service';
+import { useContainer, Connection, createConnection } from 'typeorm';
 
-/**
- * Database Wrapper
- */
+dotenv.config();
+
 export class Database {
 
-  /**
-   * Connection Instance
-   */
-  public con: Connection;
+  public connection: Connection;
+  private bCryptService: BCryptService;
 
-  /**
-   * Entity Manager Instance
-   */
-  public manager: EntityManager;
+  constructor() {
+    this.bCryptService = Container.get(BCryptService);
+  }
 
-  /**
-   * Connect to MySQL
-   */
-  public connect = async () => {
+  public async connect(): Promise<void> {
     try {
-      if (!this.con) {
-        this.con = await createConnection();
-      }
-      this.manager = this.con.manager;
-      return this.con;
-    } catch (e) {
-      console.log(e);
-      throw new Error(e);
+      if (this.connection) return;
+      useContainer(Container);
+      this.connection = await createConnection();
+    } catch (error) {
+      throw error;
     }
   }
 
-  /**
-   * Prune Database
-   */
-  public reset = async () => {
+  public async seed(): Promise<void> {
     try {
-      await this.con.synchronize(true);
-    } catch(e) {
-      console.log(e);
-      throw new Error(e);
+      const guestRole = await this.connection.createEntityManager().save(Role, { name: Roles.GUEST });
+      const adminRole = await this.connection.createEntityManager().save(Role, { name: Roles.ADMIN });
+      await this.connection.createEntityManager().save(User, {
+        username: 'Guest',
+        password: await this.bCryptService.hash('Password'),
+        roles: [guestRole]
+      });
+      await this.connection.createEntityManager().save(User, {
+        username: 'Admin',
+        password: await this.bCryptService.hash('Password'),
+        roles: [adminRole]
+      });
+    } catch (error) {
+      throw error;
     }
   }
 
-  /**
-   * Seed Data
-   */
-  public seed = async () => {
+  public async reset(): Promise<void> {
     try {
-      await new UserSeed().execute();
-    } catch(e) {
-      console.log(e);
-      throw new Error(e);
+      for (let meta of this.connection.entityMetadatas) {
+        await this.connection.manager.delete(meta.name, {});
+     }
+      await this.seed();
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  public async disconnect(): Promise<void> {
+    try {
+      return await this.connection.close();
+    } catch (error) {
+      throw error;
     }
   }
 
 }
-
-export default new Database();

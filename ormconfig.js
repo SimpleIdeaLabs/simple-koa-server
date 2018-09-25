@@ -6,9 +6,9 @@ module.exports = {
   "password": process.env.MYSQL_PASSWORD,
   "database": process.env.MYSQL_DB,
   "logging": ["error"],
-  "synchronize": true,
+  "synchronize": false,
   "entities": [
-    "dist/models/*.js"
+    "dist/database/models/*.js"
   ],
   "subscribers": [
     "src/subscriber/*.js"

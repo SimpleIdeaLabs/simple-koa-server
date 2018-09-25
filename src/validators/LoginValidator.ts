@@ -1,12 +1,9 @@
-import { User } from '../models/User';
-import Database from '../database/Database';
-import { BCryptService } from '../services/BCryptService';
+import { Container } from 'typedi';
+import { User } from '../database/models/User';
+import { Database } from './../database/Database';
+import { BCryptService } from './../services/BCrypt.service';
 import { registerDecorator, ValidationOptions, ValidationArguments } from "class-validator";
 
-/**
- * Custom Class-Validator for User Login
- * @param validationOptions 
- */
 export const ValidateLogin = (validationOptions?: ValidationOptions) => {
   return (object: Object, propertyName: string) => {
     registerDecorator({
@@ -16,8 +13,10 @@ export const ValidateLogin = (validationOptions?: ValidationOptions) => {
       constraints: [],
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
-          
+        validate(value: any, args: ValidationArguments): Promise<boolean> | boolean {
+          const bcrypt = Container.get(BCryptService);
+          const db = Container.get(Database);
+
           // Parse request body
           const parsed:any = args.object.valueOf();
 
@@ -26,9 +25,9 @@ export const ValidateLogin = (validationOptions?: ValidationOptions) => {
           if (!username || !password) return false;
           
           // Check Payload Against Database
-          return Database.manager.findOne(User, { username: value })
+          return db.connection.manager.findOne(User, { username: value })
                   .then(async (user: User) => {
-                    return user && await BCryptService.compare(password, String(user.password));
+                    return user && await bcrypt.compare(password, String(user.password));
                   });
         }
       }

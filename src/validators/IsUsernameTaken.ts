@@ -1,13 +1,10 @@
-import { User } from '../models/User';
-import Database from '../database/Database';
+import { Container } from 'typedi';
+import { User } from './../database/models/User';
+import { Database } from './../database/Database';
 import { registerDecorator, ValidationOptions, ValidationArguments } from "class-validator";
 
-/**
- * Custom Class-Validator for Username Checking
- * @param validationOptions 
- */
 export const IsUsernameTaken = (validationOptions?: ValidationOptions) => {
-  return (object: Object, propertyName: string) => {
+  return (object: Object, propertyName: string):void => {
     registerDecorator({
       name: "isUsernameTaken",
       target: object.constructor,
@@ -15,12 +12,18 @@ export const IsUsernameTaken = (validationOptions?: ValidationOptions) => {
       constraints: [],
       options: validationOptions,
       validator: {
-        validate(value: any, args: ValidationArguments) {
-           // Check Payload Against Database
-          return Database.manager.findOne(User, { username: value })
-            .then(async (user: User) => {
-              return user? false: true;
-            });
+        validate(value: any, args: ValidationArguments): Promise<boolean> {
+          const db = Container.get(Database);
+          const parsed: any = args.object.valueOf();
+          const qB = db.connection.manager.createQueryBuilder(User, 'user');
+          if (parsed.id) {
+            qB.where('user.id != :id AND user.username = :username', { id: parsed.id, username: value })
+          } else {
+            qB.where('user.username = :username', { username: value })
+          }
+          return qB.getOne().then((user) => {
+            return user ? false : true;
+          });
         }
       }
     });
