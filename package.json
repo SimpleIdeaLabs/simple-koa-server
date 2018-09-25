@@ -1,12 +1,14 @@
 {
-  "name": "simple-ts",
-  "version": "1.0.0",
-  "description": "Typescript Starter",
+  "name": "simple-koa-server",
+  "version": "2.0.0",
+  "description": "Server Boilerplate written in koa and typescript.",
   "main": "index.js",
   "keywords": [
     "Typescript",
     "Starter",
-    "Boilerplate"
+    "Boilerplate",
+    "NodeJS",
+    "Koa"
   ],
   "scripts": {
     "start": "npm run serve",
